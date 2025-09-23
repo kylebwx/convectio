@@ -11,13 +11,15 @@ class Transect:
     QC'd data possible in the future.
     """
 
-    def __init__(self, nc_filepath: str):
+    def __init__(self, nc_filepath: str, temp_contamination: bool = False):
         """
         Initializes a Transect object by loading a NetCDF file.
 
         Args:
             nc_filepath: The file path to the NetCDF file containing
                          the transect data.
+            temp_contamination: A boolean flag to indicate whether to check for
+                                temperature sensor contamination flags.
         """
         self.nc_filepath = nc_filepath
         self.data: Optional[xr.Dataset] = None
@@ -34,6 +36,16 @@ class Transect:
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
             self.data = None
+
+        if self.data is not None and temp_contamination:
+            print("Checking for temperature sensor contamination...")
+            df = self.data.to_dataframe()
+            # Use pandas string vectorization for efficiency.
+            df["contam_f"] = df["error_flag"].str.contains("tf02", na=False)
+            df["contam_s"] = df["error_flag"].str.contains("ts02", na=False)
+
+            self.data = df.to_xarray()
+            print("Contamination flags added.")
 
     def get_data_summary(self) -> Optional[pd.DataFrame]:
         """
