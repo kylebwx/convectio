@@ -13,4 +13,5 @@ dependencies = [
     "matplotlib>=3.3",
     "xarray>=2025.9.0",
     "netCDF4>=1.7.2",
+    "geopy>=2.4.0"
      ]
