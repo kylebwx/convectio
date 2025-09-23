@@ -101,8 +101,7 @@ def wind_comps(df: pd.DataFrame) -> pd.DataFrame:
     # Convert wind direction from degrees to radians
     wind_direction_rad = np.deg2rad(df["wind_dir"])
 
-    # Calculate u and v components. The negative sign is crucial because
-    # wind direction is "from where" and the components point "to where".
+    # Calculate u and v components.
     df["u"] = -df["WindSpeed"] * np.sin(wind_direction_rad)
     df["v"] = -df["WindSpeed"] * np.cos(wind_direction_rad)
 
