@@ -2,4 +2,4 @@
 ### Dr. Adam Houston at UNL.
 ### Created 23 September 2025 by Kyle Brooks.
 
-### Imports
+### Blank now, but intended to separate off error handling from flags into separate module so raw data will be relatively unaffected if the user wishes.
