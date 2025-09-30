@@ -66,7 +66,7 @@ class Transect:
             Fixes nanosecond "accuracy" by rounding to nearest second.
 
         Returns:
-            Optional[pd.DataFrame]: Pandas datafram of original data.
+            Optional[pd.DataFrame]: Pandas dataframe of original data.
         """
 
         if self.data is None:
@@ -76,5 +76,8 @@ class Transect:
         self.data["time"] = pd.to_datetime(self.data["time"], unit="ns")
         self.data["time"] = self.data["time"].round("S")
         self.data["time"] = self.data["time"].dt.strftime("%Y-%m-%d %H:%M:%S")
+        self.data.set_index(
+            pd.to_datetime(self.data["time"], unit="ns"), inplace=True, drop=True
+        )
 
         return self.data
