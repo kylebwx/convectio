@@ -76,8 +76,7 @@ class Transect:
         self.data["time"] = pd.to_datetime(self.data["time"], unit="ns")
         self.data["time"] = self.data["time"].round("S")
         self.data["time"] = self.data["time"].dt.strftime("%Y-%m-%d %H:%M:%S")
-        self.data.set_index(
-            pd.to_datetime(self.data["time"], unit="ns"), inplace=True, drop=True
-        )
+        self.data.set_index(pd.to_datetime(self.data["time"], unit="ns"), inplace=True)
+        self.data.drop(["time"], axis=1, inplace=True)
 
         return self.data
