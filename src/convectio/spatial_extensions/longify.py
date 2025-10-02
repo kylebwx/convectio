@@ -54,6 +54,10 @@ def get_distance(
         # Geodesic distance handles the curvature of the earth
         segment_distance = geodesic(current_point, next_point).m
         distances.append(segment_distance)
+        current_point = list(current_point)
         current_point[0] = next_point[0]
+        current_point = tuple(current_point)
+
+    transect["distances"] = distances
 
     return pd.Series(distances)
