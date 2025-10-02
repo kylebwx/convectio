@@ -1,7 +1,7 @@
 from geopy.distance import geodesic
 import pandas as pd
 import warnings
-from mesopy import Transect
+from convectio import Transect
 
 
 def get_distance(

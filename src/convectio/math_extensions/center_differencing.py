@@ -4,7 +4,7 @@ import os
 from .custom_math import mslp_calc
 from metpy.units import units
 from metpy.calc import wind_components
-from mesopy import Transect
+from convectio import Transect
 
 
 def center_difference(
