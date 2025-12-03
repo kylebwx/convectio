@@ -28,3 +28,5 @@ def apply_qc(df: pd.DataFrame = None):
         d_count = d_count + 1
 
     print("QC filter complete. Dropped {} rows.".format(d_count))
+
+    return df  # gotta return this >:(
