@@ -4,6 +4,7 @@
 
 ### Blank now, but intended to separate off error handling from flags into separate module so raw data will be relatively unaffected if the user wishes.
 
+import pandas as pd
 from convectio import Transect
 
 
