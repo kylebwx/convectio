@@ -8,7 +8,7 @@ import pandas as pd
 from convectio import Transect
 
 
-def apply_qc(transect: pd.DataFrame = None):
+def apply_qc(df: pd.DataFrame = None):
     """Apply QC flags based on user defined conditions"""
 
     for index, row in df.iterrows():
