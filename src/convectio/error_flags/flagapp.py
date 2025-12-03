@@ -10,7 +10,7 @@ from convectio import Transect
 
 def apply_qc(df: pd.DataFrame = None):
     """Apply QC flags based on user defined conditions"""
-
+    dcount = 0
     for index, row in df.iterrows():
         string = df["error_flag"][index]
         split = string.split("-")
