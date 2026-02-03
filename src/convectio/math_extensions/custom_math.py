@@ -141,7 +141,7 @@ def stat_mslp(p_station, z_station, temp_c, dp_c, lat_deg):
     p0 = 10 ** log_p0
 
 
-    #  (Young-Laplace Equation: https://en.wikipedia.org/wiki/Young%E2%80%93Laplace_equation)
+    # (Young-Laplace Equation: https://en.wikipedia.org/wiki/Young%E2%80%93Laplace_equation)
 
     return p0
 
