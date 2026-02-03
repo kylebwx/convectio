@@ -1,0 +1,14 @@
+# Required
+version: 2
+
+conda:
+  environment: doc/environment.yml
+
+python:
+  version: 3.8
+  install:
+    - method: pip
+      path: .
+
+sphinx:
+  configuration: doc/conf.py
