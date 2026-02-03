@@ -68,23 +68,79 @@ def thetae(TC, TdC, PhPa):
     return thetae
 
 
-def mslp_calc(pressure, height, temp):
-    """Calculates MSLP from station pressure using NWS's simple calculation.
+def stat_mslp(p_station, z_station, temp_c, dp_c, lat_deg):
+    """
+    Adjusts station pressure to Mean Sea Level Pressure (MSLP) using the
+    Laplace Barometric Formula shown in your image. Replaced original correction
+    this more robust version
 
-    Args:
-        pressure (int or float): station pressure (hPa or mb)
-        height (int or float): height of station ASL(meters)
-        temp (int or float): temperature at station (degC)
+    Parameters:
+    -----------
+    p_station : float
+        Station pressure (hPa or mb).
+    z_station : float
+        Station elevation (meters).
+    temp_c : float
+        Station temperature (Celsius).
+    dp_c : float
+        Station dewpoint (Celsius).
+    lat_deg : float
+        Station latitude (Degrees).
 
     Returns:
-        pressure_msl (int or float): Corrected MSLP (not accounting for moisture)
+    --------
+    float : Mean Sea Level Pressure (hPa).
     """
 
-    press_msl = pressure * (
-        1 - (0.0065 * height) / (temp + 0.0065 * height + 273.15)
-    ) ** (-5.257)
+    # --- Constants ---
+    K = 18400.4  # Hypsometric constant for this specific log10 form
+    alpha = 0.003661  # Coefficient of thermal expansion (1/273.15)
+    k_lat = 0.00266  # Gravity constant for latitude correction
+    R_earth = 6371000  # Radius of Earth in meters
 
-    return press_msl
+    # --- 1. Calculate Vapor Pressure (e) ---
+    # Using Bolton's approximation (1980) because it's robust
+    # e in hPa
+    e = 6.112 * np.exp((17.67 * dp_c) / (dp_c + 243.5))
+
+
+    #### LATER VERSIONS SHOULD ADD ABILITY TO ENTER REAL LAPSE RATES
+    # Calculate Mean Column Temperature (theta_m)
+    # This is the biggest pain in the ass. The "standard" way is to assume
+    # a lapse rate of 6.5 C/km between the station and sea level. This changes
+    # between countries and even CWAs
+    # theta_m = (T_station + T_sealevel) / 2
+    # T_sealevel approx = T_station + (0.0065 * Elevation)
+    t_lapse_adjustment = (0.0065 * z_station) / 2
+    theta_m = temp_c + t_lapse_adjustment
+
+    #  Compute the correction factors
+
+    # Temperature Term: (1 + alpha * theta_m)
+    term_temp = 1 + (alpha * theta_m)
+
+    # Humidity Term: 1 / (1 - 0.378 * (e / p_station))
+    # Note: 0.378 is roughly (1 - epsilon)/epsilon where epsilon = 0.622
+    term_humidity = 1 / (1 - 0.378 * (e / p_station))
+
+    # Latitude/Gravity Term: 1 / (1 - k * cos(2 * phi))
+    lat_rad = np.radians(lat_deg)
+    term_gravity = 1 / (1 - k_lat * np.cos(2 * lat_rad))
+
+    # Vertical Gradient Term: (1 + Z / R)
+    term_vertical = 1 + (z_station / R_earth)
+
+    # Combine denominator
+    denominator = K * term_temp * term_humidity * term_gravity * term_vertical
+
+    # --- 4. Solve the Equation ---
+    # log10(p0) = log10(p) + (Z / denominator)
+    log_p0 = np.log10(p_station) + (z_station / denominator)
+
+    # Convert back from log10
+    p0 = 10 ** log_p0
+
+    return p0
 
 
 def wind_comps(df: pd.DataFrame) -> pd.DataFrame:
