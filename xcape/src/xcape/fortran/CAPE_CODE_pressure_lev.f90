@@ -215,7 +215,7 @@
 !           z - one dimensional array of heights above ground level (m) (real)
 !  Output:  cape - Convective Available Potential Energy (J/kg) (real)
 !
-!            cin - Convective Inhibition (J/kg) (real) test
+!            cin - Convective Inhibition (J/kg) (real)
 !
 !-----------------------------------------------------------------------
 
