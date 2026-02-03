@@ -1,0 +1,13 @@
+name: xcape_docs
+dependencies:
+  - python=3.6
+  - numpy
+  - xarray
+  - dask
+  - toolz
+  - numpydoc
+  - sphinx
+  - sphinx_rtd_theme
+  - pip
+  - pip:
+    - sphinx_pangeo_theme
