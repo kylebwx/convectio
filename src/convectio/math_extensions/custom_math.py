@@ -71,7 +71,7 @@ def thetae(TC, TdC, PhPa):
 def stat_mslp(p_station, z_station, temp_c, dp_c, lat_deg):
     """
     Adjusts station pressure to Mean Sea Level Pressure (MSLP) using the
-    Laplace Barometric Formula shown in your image. Replaced original correction
+    Laplace Barometric Formula. Replaced original correction
     this more robust version
 
     Parameters:
@@ -139,6 +139,9 @@ def stat_mslp(p_station, z_station, temp_c, dp_c, lat_deg):
 
     # Convert back from log10
     p0 = 10 ** log_p0
+
+
+    #  (Young-Laplace Equation: https://en.wikipedia.org/wiki/Young%E2%80%93Laplace_equation)
 
     return p0
 
