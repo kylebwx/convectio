@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import os
-from .custom_math import mslp_calc
+from .custom_math import stat_mslp
 from metpy.units import units
 from metpy.calc import wind_components
 from convectio import Transect
