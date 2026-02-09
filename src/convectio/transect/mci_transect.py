@@ -13,7 +13,9 @@ class Mitten:
 
     def __init__(self, iop_nums: Union[int, List[int]],
                  transect_nums: Union[int, List[int], List[List[int]]],
-                 print_config: bool = True, comet_ident: str = 'alpha'):
+                 dirty_qc: bool = False,
+                 print_config: bool = True,
+                 comet_ident: str = 'alpha'):
 
         # --- 1. Input Normalization ---
         if isinstance(iop_nums, int):
@@ -85,10 +87,10 @@ class Mitten:
                     print(f"Warning: File not found {ncfile}")
                     continue
 
-                # 1. Open the dataset
-                ds = xr.open_dataset(ncfile)
+                # Open the dataset
+                ds = xr.open_dataset(ncfile, decode_timedelta=True)
 
-                # 2. Get Filename Date/Time parts (just in case we need them)
+                # get Filename Date/Time parts (just in case we need them)
                 # Filename: UNL.CoMeTalpha.20240721.1345...
                 parts = ncfile.name.split('.')
                 f_date_str = parts[2]  # "20240721"
@@ -140,6 +142,25 @@ class Mitten:
                 _, index = np.unique(ds['time'], return_index=True)
                 ds = ds.isel(time=index)
 
+                if dirty_qc:
+                    # 1. Cast to string and ensure we handle the 'time' dimension
+                    flags = ds["error_flag"].astype(str)
+
+                    # check for the specific codes directly
+                    # This avoids the .split('-') dimension entirely
+                    mask_tf02 = flags.str.contains('tf02')
+                    mask_ts02 = flags.str.contains('ts02')
+                    mask_w08 = flags.str.contains('w08')
+
+                    drop_mask = mask_tf02 | mask_ts02 | mask_w08
+
+                    orig_len = ds.sizes['time']
+                    # Use drop=True without the 'inplace'
+                    ds = ds.where(~drop_mask, drop=True)
+
+                    if print_config:
+                        print(f"QC: Dropped {orig_len - ds.sizes['time']} points from {ncfile.name}")
+
                 cleaned_datasets.append(ds)
 
             except Exception as e:
@@ -180,3 +201,29 @@ class Mitten:
     def show_config(self):
         for iop, trans in self.Tr_map.items():
             print(f"Configured IOP {iop} with Transects: {trans}")
+
+    def extract_tr(self, transect_id: str) -> xr.Dataset:
+        """
+        Extracts a single transect as a standalone Dataset.
+
+        Args:
+            transect_id (str): The unique ID (e.g., 'IOP08_T01_E')
+
+        Returns:
+            xr.Dataset: A new dataset containing only that transect's data.
+        """
+        # Does this ID exist?
+        available_ids = np.unique(self.ds.transect_id.values)
+        if transect_id not in available_ids:
+            # Helpful error message so you don't lose your mind guessing IDs
+            raise ValueError(f"Transect '{transect_id}' not found.\nAvailable IDs: {available_ids}")
+
+        # Slice (Boolean Masking)
+        # We find where the coordinate equals the ID, and keep only those time steps.
+        subset = self.ds.isel(time=(self.ds.transect_id == transect_id))
+
+        # Add attributes the plot knows what it's looking at
+        subset.attrs['transect_id'] = transect_id
+        subset.attrs['description'] = f"Extracted slice for {transect_id}"
+
+        return subset
