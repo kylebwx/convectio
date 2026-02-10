@@ -1,5 +1,3 @@
+from .transect.mci_transect import Mitten
 from .transect.transect import Transect
-from .spatial_extensions.longify import get_distance
-from .math_extensions.center_differencing import center_difference
-from .math_extensions.custom_math import mslp_calc, thetae
-from .error_flags.flagapp import apply_qc
+from .math_extensions.custom_math import stat_mslp, thetae

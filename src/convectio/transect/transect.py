@@ -5,6 +5,7 @@ from typing import Optional
 import os
 
 
+### This module is considered legacy; However, it might be useful in the future
 class Transect:
     """
     A class to represent and process a single mobile mesonet transect. Designed to ingest QC'd MM data w/ optional support for non-
