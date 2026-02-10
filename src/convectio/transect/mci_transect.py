@@ -198,6 +198,8 @@ class Mitten:
             print(f"Success! Loaded {len(self.ds.time)} time steps.")
             print("Transects available:", np.unique(self.ds.transect_id.values))
 
+
+
     def show_config(self):
         for iop, trans in self.Tr_map.items():
             print(f"Configured IOP {iop} with Transects: {trans}")
@@ -227,3 +229,9 @@ class Mitten:
         subset.attrs['description'] = f"Extracted slice for {transect_id}"
 
         return subset
+
+    def transect_dict(self, transect_id:str) -> dict:
+        data_dict = {'tr_UID': self.meta_subset['unique_id'].values,
+                    'lbf_time': self.meta_subset['lbf_cross_time'].values,
+                    'tr_direction': self.meta_subset['direction'].values}
+        return data_dict
