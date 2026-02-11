@@ -1,2 +1,4 @@
 # convectIO
-convectIO is a custom Python package built from the ground up as a conglomeration of all (or most) of my PhD work at CMich. It is, in theory, eventually intended to replace or at least improve upon metpy.
+convectIO is a custom Python package built from the ground up as a sort of wrapper around the monotonous meteorology data loading and manipulation. It is, in theory, eventually intended to replace or at least improve upon the existing (but scattered) package landscape for atmospheric science in Python.
+
+For full transparency, I have written all of the logic and code myself. I do, however, use LLMs STRICTLY FOR commenting and organizing my code. I am currently the sole architect of this package and believe that this is an acceptable use of artifical intelligence. Again, logic and base code are written by me and explicitly unchanged outside of commenting and organization (mostly indentation). I was never really taught programming by the book and am continuing to learn how to do this for future works.
