@@ -201,6 +201,11 @@ class Mitten:
 
 
     def show_config(self):
+        """
+        Shows configured IOPs and paired Transects.
+        Returns:
+
+        """
         for iop, trans in self.Tr_map.items():
             print(f"Configured IOP {iop} with Transects: {trans}")
 
@@ -230,8 +235,28 @@ class Mitten:
 
         return subset
 
-    def transect_dict(self, transect_id:str) -> dict:
-        data_dict = {'tr_UID': self.meta_subset['unique_id'].values,
-                    'lbf_time': self.meta_subset['lbf_cross_time'].values,
-                    'tr_direction': self.meta_subset['direction'].values}
+    def transect_dict(self, transect_id:str = 'all') -> dict:
+
+        """
+
+        Args:
+            transect_id (str): The unique transect ID (e.g., 'IOP08_T01_E')
+
+        Returns:
+                Dictionary containing transect UID, LBF cross time (if applicable), and the direction
+                of the transect.
+        """
+
+        if transect_id != 'all' and transect_id not in self.meta_subset['unique_id'].values:
+            raise ValueError(f"Transect ID '{transect_id}' not in available IDs.")
+
+        if transect_id == 'all':
+            meta_subset_tdict = self.meta_subset
+        elif transect_id != 'all':
+            meta_subset_tdict = self.meta_subset[(self.meta_subset['unique_id']==transect_id)]
+
+        data_dict = {'tr_UID': meta_subset_tdict['unique_id'].values,
+                    'lbf_time': meta_subset_tdict['lbf_cross_time'].values,
+                    'tr_direction': meta_subset_tdict['direction'].values}
+
         return data_dict
