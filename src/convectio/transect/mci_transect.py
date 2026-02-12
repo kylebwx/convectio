@@ -5,6 +5,8 @@ import os
 from pathlib import Path
 from typing import Optional, List, Union
 
+from convectio.spatial.reldist import rel_distance
+
 
 class Mitten:
     """
@@ -209,21 +211,29 @@ class Mitten:
         for iop, trans in self.Tr_map.items():
             print(f"Configured IOP {iop} with Transects: {trans}")
 
-    def extract_tr(self, transect_id: str) -> xr.Dataset:
+    def extract_tr(self, transect_id: str = 'all') -> xr.Dataset:
         """
         Extracts a single transect as a standalone Dataset.
 
         Args:
-            transect_id (str): The unique ID (e.g., 'IOP08_T01_E')
+            transect_id (str): The unique ID (e.g., 'IOP08_T01_E'). This defaults to
+            returning all transects in a dataset.
 
         Returns:
             xr.Dataset: A new dataset containing only that transect's data.
         """
         # Does this ID exist?
         available_ids = np.unique(self.ds.transect_id.values)
-        if transect_id not in available_ids:
-            # Helpful error message so you don't lose your mind guessing IDs
-            raise ValueError(f"Transect '{transect_id}' not found.\nAvailable IDs: {available_ids}")
+        if transect_id != 'all':
+            if transect_id not in available_ids:
+                # Helpful error message so you don't lose your mind guessing IDs
+                raise ValueError(f"Transect '{transect_id}' not found.\nAvailable IDs: {available_ids}")
+
+        if transect_id == 'all':
+
+            self.ds.attrs['description'] = "All selected transects."
+
+            return self.ds
 
         # Slice (Boolean Masking)
         # We find where the coordinate equals the ID, and keep only those time steps.
