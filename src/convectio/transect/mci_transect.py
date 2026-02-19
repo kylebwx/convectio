@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 from typing import Optional, List, Union
 
-from convectio.spatial.reldist_bckp import rel_distance
+from convectio.spatial.reldist import rel_distance
 
 
 class Mitten:
