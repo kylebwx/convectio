@@ -41,16 +41,13 @@ def calculate_single_transect(ds_subset, front_time, ls_coords):
 
     dist_at_front = cumulative_dist[front_idx]
 
-    # --- THE FIX: Sign Logic ---
-    # User Request: "Ahead (Before Crossing) = Positive", "Behind (After Crossing) = Negative"
-    #
     # CASE 1: Before Crossing (Time < FrontTime)
     #   cumulative_dist is SMALL. dist_at_front is BIG.
-    #   (Big - Small) = Positive. Correct.
+    #   (Big - Small) = Positive.
     #
     # CASE 2: After Crossing (Time > FrontTime)
     #   cumulative_dist is BIG. dist_at_front is SMALL.
-    #   (Small - Big) = Negative. Correct.
+    #   (Small - Big) = Negative.
 
     f_dist = dist_at_front - cumulative_dist
 
