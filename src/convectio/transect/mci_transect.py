@@ -5,6 +5,8 @@ import os
 from pathlib import Path
 from typing import Optional, List, Union
 
+from convectio.spatial.reldist import rel_distance
+
 
 class Mitten:
     """
@@ -201,24 +203,37 @@ class Mitten:
 
 
     def show_config(self):
+        """
+        Shows configured IOPs and paired Transects.
+        Returns:
+
+        """
         for iop, trans in self.Tr_map.items():
             print(f"Configured IOP {iop} with Transects: {trans}")
 
-    def extract_tr(self, transect_id: str) -> xr.Dataset:
+    def extract_tr(self, transect_id: str = 'all') -> xr.Dataset:
         """
         Extracts a single transect as a standalone Dataset.
 
         Args:
-            transect_id (str): The unique ID (e.g., 'IOP08_T01_E')
+            transect_id (str): The unique ID (e.g., 'IOP08_T01_E'). This defaults to
+            returning all transects in a dataset.
 
         Returns:
             xr.Dataset: A new dataset containing only that transect's data.
         """
         # Does this ID exist?
         available_ids = np.unique(self.ds.transect_id.values)
-        if transect_id not in available_ids:
-            # Helpful error message so you don't lose your mind guessing IDs
-            raise ValueError(f"Transect '{transect_id}' not found.\nAvailable IDs: {available_ids}")
+        if transect_id != 'all':
+            if transect_id not in available_ids:
+                # Helpful error message so you don't lose your mind guessing IDs
+                raise ValueError(f"Transect '{transect_id}' not found.\nAvailable IDs: {available_ids}")
+
+        if transect_id == 'all':
+
+            self.ds.attrs['description'] = "All selected transects."
+
+            return self.ds
 
         # Slice (Boolean Masking)
         # We find where the coordinate equals the ID, and keep only those time steps.
@@ -230,8 +245,39 @@ class Mitten:
 
         return subset
 
-    def transect_dict(self, transect_id:str) -> dict:
-        data_dict = {'tr_UID': self.meta_subset['unique_id'].values,
-                    'lbf_time': self.meta_subset['lbf_cross_time'].values,
-                    'tr_direction': self.meta_subset['direction'].values}
+    def transect_dict(self, transect_id:str = 'all') -> dict:
+
+        """
+
+        Args:
+            transect_id (str): The unique transect ID (e.g., 'IOP08_T01_E')
+
+        Returns:
+                Dictionary containing transect UID, LBF cross time (if applicable), and the direction
+                of the transect.
+        """
+
+        if transect_id != 'all' and transect_id not in self.meta_subset['unique_id'].values:
+            raise ValueError(f"Transect ID '{transect_id}' not in available IDs.")
+
+        if transect_id == 'all':
+            meta_subset_tdict = self.meta_subset
+        elif transect_id != 'all':
+            meta_subset_tdict = self.meta_subset[(self.meta_subset['unique_id']==transect_id)]
+
+        lbf_series = pd.to_datetime(
+            meta_subset_tdict['lbf_cross_time'].replace(-999, np.nan),
+            errors='coerce', format='%H:%M:%S'
+        )
+
+        data_dict = {'tr_UID': meta_subset_tdict['unique_id'].values,
+                     'transect_num': meta_subset_tdict['transect'].values,
+                     'iop': meta_subset_tdict['iop'].values,
+                     'date': pd.to_datetime(meta_subset_tdict[['year', 'month', 'day']]).dt.strftime('%Y-%m-%d').tolist(),
+                     'start_time': pd.to_datetime(meta_subset_tdict['start_dt']).dt.strftime('%H:%M:%S').tolist(),
+                     'end_time': pd.to_datetime(meta_subset_tdict['end_dt']).dt.strftime('%H:%M:%S').tolist(),
+                     'tr_direction': meta_subset_tdict['direction'].values,
+                     'lbf_time': [t.strftime('%H:%M:%S') if pd.notnull(t) else None for t in lbf_series]}
+
+
         return data_dict
