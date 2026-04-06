@@ -266,7 +266,11 @@ class Mitten:
             meta_subset_tdict = self.meta_subset[(self.meta_subset['unique_id']==transect_id)]
 
         data_dict = {'tr_UID': meta_subset_tdict['unique_id'].values,
-                    'lbf_time': meta_subset_tdict['lbf_cross_time'].values,
-                    'tr_direction': meta_subset_tdict['direction'].values}
+                     'iop': meta_subset_tdict['iop'].values,
+                     'date': np.array(pd.to_datetime(meta_subset_tdict[['year', 'month', 'day']]).dt.strftime('%Y-%m-%d')),
+                     'start_time': pd.to_datetime(meta_subset_tdict['start_dt']).dt.strftime('%H:%M:%S').values,
+                     'end_time': pd.to_datetime(meta_subset_tdict['end_dt']).dt.strftime('%H:%M:%S').values,
+                     'lbf_time': meta_subset_tdict['lbf_cross_time'].values,
+                     'tr_direction': meta_subset_tdict['direction'].values}
 
         return data_dict
