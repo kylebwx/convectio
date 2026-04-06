@@ -265,12 +265,19 @@ class Mitten:
         elif transect_id != 'all':
             meta_subset_tdict = self.meta_subset[(self.meta_subset['unique_id']==transect_id)]
 
+        lbf_series = pd.to_datetime(
+            meta_subset_tdict['lbf_cross_time'].replace(-999, np.nan),
+            errors='coerce', format='%H:%M:%S'
+        )
+
         data_dict = {'tr_UID': meta_subset_tdict['unique_id'].values,
+                     'transect_num': meta_subset_tdict['transect'].values,
                      'iop': meta_subset_tdict['iop'].values,
-                     'date': np.array(pd.to_datetime(meta_subset_tdict[['year', 'month', 'day']]).dt.strftime('%Y-%m-%d')),
-                     'start_time': pd.to_datetime(meta_subset_tdict['start_dt']).dt.strftime('%H:%M:%S').values,
-                     'end_time': pd.to_datetime(meta_subset_tdict['end_dt']).dt.strftime('%H:%M:%S').values,
-                     'lbf_time': meta_subset_tdict['lbf_cross_time'].values,
-                     'tr_direction': meta_subset_tdict['direction'].values}
+                     'date': pd.to_datetime(meta_subset_tdict[['year', 'month', 'day']]).dt.strftime('%Y-%m-%d').tolist(),
+                     'start_time': pd.to_datetime(meta_subset_tdict['start_dt']).dt.strftime('%H:%M:%S').tolist(),
+                     'end_time': pd.to_datetime(meta_subset_tdict['end_dt']).dt.strftime('%H:%M:%S').tolist(),
+                     'tr_direction': meta_subset_tdict['direction'].values,
+                     'lbf_time': [t.strftime('%H:%M:%S') if pd.notnull(t) else None for t in lbf_series]}
+
 
         return data_dict
